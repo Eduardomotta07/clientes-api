@@ -1,4 +1,5 @@
 package br.com.senac.api.controllers;
+import br.com.senac.api.dtos.ClienteFiltroDTO;
 import br.com.senac.api.dtos.ClientesRequestDTO;
 import br.com.senac.api.entidades.Clientes;
 import br.com.senac.api.repositorios.ClientesRepositorio;
@@ -21,13 +22,8 @@ public class ClientesController {
     }
 
     @GetMapping("/listar")
-    public ResponseEntity<List<Clientes>> listar(){
-        List<Clientes> clientesList = clientesService.listar();
-
-        if (clientesList.isEmpty()){
-            return ResponseEntity.status(204).body(null);
-        }
-        return ResponseEntity.ok(clientesService.listar());
+    public ResponseEntity<List<Clientes>> listar(ClienteFiltroDTO filtro){
+        return ResponseEntity.ok(clientesService.listar(filtro));
     }
 
     @PostMapping("/criar")
@@ -70,4 +66,14 @@ public class ClientesController {
         }
     }
 
+    public ResponseEntity<Clientes> ListarByID (@PathVariable Long id){
+
+        try {
+            return ResponseEntity.ok(clientesService.ListarByID(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(null);
+        } catch (Exception e){
+            return ResponseEntity.internalServerError().body(null);
+        }
+    }
 }

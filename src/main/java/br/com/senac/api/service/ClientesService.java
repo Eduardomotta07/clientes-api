@@ -1,4 +1,5 @@
 package br.com.senac.api.service;
+import br.com.senac.api.dtos.ClienteFiltroDTO;
 import br.com.senac.api.dtos.ClientesRequestDTO;
 import br.com.senac.api.entidades.Clientes;
 import br.com.senac.api.repositorios.ClientesRepositorio;
@@ -15,17 +16,30 @@ public class ClientesService {
         this.clientesRepositorio = clientesRepositorio;
     }
 
-    public List<Clientes> listar (){
+    public List<Clientes> listar(ClienteFiltroDTO filtro) {
+
+        if (filtro.getNome() != null){
+            return clientesRepositorio.findByNomeContaining(filtro.getNome());
+        }
+
+        if (filtro.getEmail() != null){
+            return clientesRepositorio.findByEmail(filtro.getEmail());
+        }
+
+        if (filtro.getIdade() != null){
+            return clientesRepositorio.findByIdadeGreaterThan(filtro.getIdade());
+        }
+
         return clientesRepositorio.findAll();
     }
 
-    public Clientes criar (ClientesRequestDTO cliente){
+    public Clientes criar (ClientesRequestDTO cliente) {
         Clientes clientePersist = this.clientesRequestDtoParaClientes(cliente);
 
         return clientesRepositorio.save(clientePersist);
     }
 
-    private Clientes clientesRequestDtoParaClientes(ClientesRequestDTO entrada){
+    private Clientes clientesRequestDtoParaClientes(ClientesRequestDTO entrada) {
         Clientes saida = new Clientes();
 
         saida.setNome(entrada.getNome());
@@ -36,7 +50,7 @@ public class ClientesService {
         return saida;
     }
 
-    public Clientes atualizar (Long id, ClientesRequestDTO cliente){
+    public Clientes atualizar(Long id, ClientesRequestDTO cliente) {
 
         if (clientesRepositorio.existsById(id)) {
 
@@ -50,7 +64,7 @@ public class ClientesService {
         throw new RuntimeException("Cliente não encontrado!");
     }
 
-    public void deletar (Long id){
+    public void deletar(Long id) {
 
         if (clientesRepositorio.existsById(id)) {
 
@@ -59,5 +73,13 @@ public class ClientesService {
 
         throw new RuntimeException("Cliente não encontrado!");
 
+    }
+
+    public Clientes ListarByID(Long id) {
+        if (clientesRepositorio.existsById(id)) {
+            return clientesRepositorio.findById(id).get();
+        } else {
+            throw new RuntimeException("Cliente não existe");
+        }
     }
 }
